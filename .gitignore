@@ -26,3 +26,5 @@ checkers-*.tar
 /tmp/
 
 .elixir_ls/
+
+db/

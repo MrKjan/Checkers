@@ -8,6 +8,7 @@ defmodule Checkers.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      Checkers.Repo,
       # Starts a worker by calling: Checkers.Worker.start_link(arg)
       # {Checkers.Worker, arg}
     ]

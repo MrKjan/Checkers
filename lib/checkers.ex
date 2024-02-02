@@ -1,4 +1,5 @@
 defmodule Checkers do
+  require Ecto.Query
   @moduledoc """
   Documentation for `Checkers`.
   """
