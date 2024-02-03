@@ -1,6 +1,7 @@
 defmodule Checkers.Core.Board do
   alias Checkers.Core.Move
   import Checkers.Core
+  use Accessible
 
   defstruct pos: %{},
     player_white: nil,
@@ -43,15 +44,6 @@ defmodule Checkers.Core.Board do
     end
   end
 
-  def update_if(board, key, value, condition) do
-    cond do
-      condition.(board) -> Map.put(board, key, value)
-      true -> board
-    end
-  end
-
-  def update_pos(board, key, value), do: %{board | pos: %{board.pos | key => value}}
-
   def natural_move(board, from, to) do
     nb = natural_bindings()
     from = nb[from]
@@ -75,12 +67,13 @@ defmodule Checkers.Core.Board do
       move.color != board.turn -> :error
       true ->
         board
-          |> update_pos(move.from, :empty)
-          |> update_pos(move.to, move.color)
-          |> then(fn b -> if nil != move.capture, do: update_pos(b, move.capture, :empty), else: b end)
+          |> update_in([:pos, move.from], fn _ -> :empty end)
+          |> update_in([:pos, move.to], fn _ -> move.color end)
+          |> then(fn b ->
+            if nil != move.capture, do: update_in(b, [:pos, move.capture], fn _ -> :empty end), else: b end)
           |> then(fn b ->
               if not king?(move.color) and Move.reaches_end?(move) do
-                update_pos(b, move.to, promote(move.color))
+                update_in(b, [:pos, move.to], fn _ -> promote move.color end)
               else
                 b
               end

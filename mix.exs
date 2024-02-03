@@ -25,6 +25,7 @@ defmodule Checkers.MixProject do
       {:ecto, "~> 3.11"},
       {:ecto_sqlite3, "~> 0.15.0"},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:accessible, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]
   end
