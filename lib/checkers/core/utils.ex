@@ -1,31 +1,43 @@
-defmodule Checkers.Core do
+defmodule Checkers.Core.Utils do
+  @compile {:inline, black?: 1}
   def black?(:black), do: true
   def black?(:black_king), do: true
   def black?(_color), do: false
 
+  @compile {:inline, empty?: 1}
+  def empty?(:empty), do: true
+  def empty?(_color), do: false
+
+  @compile {:inline, white?: 1}
   def white?(:white), do: true
   def white?(:white_king), do: true
   def white?(_color), do: false
 
+  @compile {:inline, king?: 1}
   def king?(:black_king), do: true
   def king?(:white_king), do: true
   def king?(_color), do: false
 
+  @compile {:inline, man?: 1}
   def man?(:white), do: true
   def man?(:black), do: true
   def man?(_color), do: false
 
+  @compile {:inline, promote: 1}
   def promote(:white), do: :white_king
   def promote(:black), do: :black_king
 
+  @compile {:inline, switch_turn: 1}
   def switch_turn(:white), do: :black
   def switch_turn(:black), do: :white
 
+  @compile {:inline, get_color: 1}
   def get_color(:white), do: :white
   def get_color(:white_king), do: :white
   def get_color(:black), do: :black
   def get_color(:black_king), do: :black
 
+  @compile {:inline, natural_bindings: 0}
   def natural_bindings() do
     %{
       a1: {1, 1}, c1: {3, 1}, e1: {5, 1}, g1: {7, 1},

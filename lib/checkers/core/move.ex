@@ -5,11 +5,8 @@ defmodule Checkers.Core.Move do
     struct!(__MODULE__, fields)
   end
 
-  def reaches_end?(move) do
-    cond do
-      move.color == :white and elem(move.to, 1) == 8 -> true
-      move.color == :black and elem(move.to, 1) == 1 -> true
-      true -> false
-    end
-  end
+  @compile {:inline, reaches_end?: 1}
+  def reaches_end?(move) when move.color == :white and 8 == elem(move.to, 1), do: true
+  def reaches_end?(move) when move.color == :black and 1 == elem(move.to, 1), do: true
+  def reaches_end?(_), do: false
 end

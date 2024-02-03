@@ -1,6 +1,6 @@
 defmodule Checkers.Core.Board do
   alias Checkers.Core.Move
-  import Checkers.Core
+  import Checkers.Core.Utils
   use Accessible
 
   defstruct pos: %{},
@@ -60,6 +60,27 @@ defmodule Checkers.Core.Board do
     ret
   end
 
+  defp try_switch_turn(board, move) do
+    if not (can_capture?(move.to, board.pos) and nil != move.capture) do
+      %{board | turn: switch_turn(board.turn)}
+    else
+      board
+    end
+  end
+
+  # defp try_promote(board, move) when not king?(move.color) and Move.reaches_end?(move) do
+  #   update_in(board, [:pos, move.to], fn _ -> promote move.color end)
+  # end
+  # defp try_promote(board, move), do: board
+
+  defp try_promote(board, move) do
+    if not king?(move.color) and Move.reaches_end?(move) do
+      update_in(board, [:pos, move.to], fn _ -> promote move.color end)
+    else
+      board
+    end
+  end
+
   @spec apply_move(struct(), __MODULE__) :: __MODULE__ | atom()
   def apply_move(move, board) do
     cond do
@@ -71,20 +92,8 @@ defmodule Checkers.Core.Board do
           |> update_in([:pos, move.to], fn _ -> move.color end)
           |> then(fn b ->
             if nil != move.capture, do: update_in(b, [:pos, move.capture], fn _ -> :empty end), else: b end)
-          |> then(fn b ->
-              if not king?(move.color) and Move.reaches_end?(move) do
-                update_in(b, [:pos, move.to], fn _ -> promote move.color end)
-              else
-                b
-              end
-            end)
-          |> then(fn b ->
-              if not (can_capture?(move.to, b.pos) and nil != move.capture) do
-                %{b | turn: switch_turn(b.turn)}
-              else
-                b
-              end
-            end)
+          |> try_promote(move)
+          |> try_switch_turn(move)
           |> then(fn b -> %{b | moves_cnt: b.moves_cnt + 1} end)
           |> then(fn b -> %{b | moves: [move | b.moves]} end)
     end
@@ -110,32 +119,32 @@ defmodule Checkers.Core.Board do
 
   def can_capture_right?({x, y}, pos) do
     cond do
-      pos[{x, y}] == :white and pos[{x+1, y+1}] == :black and pos[{x+2, y+2}] == :empty -> true
-      pos[{x, y}] == :black and pos[{x+1, y-1}] == :white and pos[{x+2, y-2}] == :empty -> true
+      white?(pos[{x, y}]) and black?(pos[{x+1, y+1}]) and empty?(pos[{x+2, y+2}]) -> true
+      black?(pos[{x, y}]) and white?(pos[{x+1, y-1}]) and empty?(pos[{x+2, y-2}]) -> true
       true -> false
     end
   end
 
   def can_capture_left?({x, y}, pos) do
     cond do
-      pos[{x, y}] == :white and pos[{x-1, y+1}] == :black and pos[{x-2, y+2}] == :empty -> true
-      pos[{x, y}] == :black and pos[{x-1, y-1}] == :white and pos[{x-2, y-2}] == :empty -> true
+      white?(pos[{x, y}]) and black?(pos[{x-1, y+1}]) and empty?(pos[{x-2, y+2}]) -> true
+      black?(pos[{x, y}]) and white?(pos[{x-1, y-1}]) and empty?(pos[{x-2, y-2}]) -> true
       true -> false
     end
   end
 
   def can_move_right?({x, y}, pos) do
     cond do
-      pos[{x, y}] == :white and pos[{x+1, y+1}] == :empty and not can_capture_left?({x, y}, pos) -> true
-      pos[{x, y}] == :black and pos[{x+1, y-1}] == :empty and not can_capture_left?({x, y}, pos) -> true
+      white?(pos[{x, y}]) and empty?(pos[{x+1, y+1}]) and not can_capture_left?({x, y}, pos) -> true
+      black?(pos[{x, y}]) and empty?(pos[{x+1, y-1}]) and not can_capture_left?({x, y}, pos) -> true
       true -> false
     end
   end
 
   def can_move_left?({x, y}, pos) do
     cond do
-      pos[{x, y}] == :white and pos[{x-1, y+1}] == :empty and not can_capture_right?({x, y}, pos) -> true
-      pos[{x, y}] == :black and pos[{x-1, y-1}] == :empty and not can_capture_right?({x, y}, pos) -> true
+      white?(pos[{x, y}]) and empty?(pos[{x-1, y+1}]) and not can_capture_right?({x, y}, pos) -> true
+      black?(pos[{x, y}]) and empty?(pos[{x-1, y-1}]) and not can_capture_right?({x, y}, pos) -> true
       true -> false
     end
   end
@@ -147,13 +156,13 @@ defmodule Checkers.Core.Board do
 
   def get_possible_right_move({x, y}, pos) do
     cond do
-      pos[{x, y}] == :white and can_move_right?({x, y}, pos) ->
+      white?(pos[{x, y}]) and can_move_right?({x, y}, pos) ->
         Move.new(capture: nil, color: :white, from: {x, y}, to: {x+1, y+1})
-      pos[{x, y}] == :white and can_capture_right?({x, y}, pos) ->
+      white?(pos[{x, y}]) and can_capture_right?({x, y}, pos) ->
         Move.new(capture: {x+1, y+1}, color: :white, from: {x, y}, to: {x+2, y+2})
-      pos[{x, y}] == :black and can_move_right?({x, y}, pos) ->
+      black?(pos[{x, y}]) and can_move_right?({x, y}, pos) ->
         Move.new(capture: nil, color: :black, from: {x, y}, to: {x+1, y-1})
-      pos[{x, y}] == :black and can_capture_right?({x, y}, pos) ->
+      black?(pos[{x, y}]) and can_capture_right?({x, y}, pos) ->
         Move.new(capture: {x+1, y-1}, color: :black, from: {x, y}, to: {x+2, y-2})
       true -> nil
     end
