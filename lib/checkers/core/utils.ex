@@ -1,27 +1,33 @@
 defmodule Checkers.Core.Utils do
-  @compile {:inline, black?: 1}
-  def black?(:black), do: true
-  def black?(:black_king), do: true
-  def black?(_color), do: false
+  # @compile {:inline, black?: 1}
+  # def black?(:black), do: true
+  # def black?(:black_king), do: true
+  # def black?(_color), do: false
 
-  @compile {:inline, empty?: 1}
-  def empty?(:empty), do: true
-  def empty?(_color), do: false
+  # @compile {:inline, empty?: 1}
+  # def empty?(:empty), do: true
+  # def empty?(_color), do: false
 
-  @compile {:inline, white?: 1}
-  def white?(:white), do: true
-  def white?(:white_king), do: true
-  def white?(_color), do: false
+  # @compile {:inline, white?: 1}
+  # def white?(:white), do: true
+  # def white?(:white_king), do: true
+  # def white?(_color), do: false
 
-  @compile {:inline, king?: 1}
-  def king?(:black_king), do: true
-  def king?(:white_king), do: true
-  def king?(_color), do: false
+  # @compile {:inline, king?: 1}
+  # def king?(:black_king), do: true
+  # def king?(:white_king), do: true
+  # def king?(_color), do: false
 
-  @compile {:inline, man?: 1}
-  def man?(:white), do: true
-  def man?(:black), do: true
-  def man?(_color), do: false
+  defguard is_white(color) when color == :white or color == :white_king
+  defguard is_black(color) when color == :black or color == :black_king
+  defguard is_empty(color) when color == :empty
+  defguard is_king(color) when color == :black_king or color == :white_king
+  defguard is_man(color) when color == :white or color == :black
+
+  # @compile {:inline, man?: 1}
+  # def man?(:white), do: true
+  # def man?(:black), do: true
+  # def man?(_color), do: false
 
   @compile {:inline, promote: 1}
   def promote(:white), do: :white_king
