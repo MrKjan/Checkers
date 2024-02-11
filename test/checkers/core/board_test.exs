@@ -1,31 +1,31 @@
-defmodule BoardTest do
+defmodule OldBoardTest do
   use ExUnit.Case
-  doctest Checkers.Core.Board
+  doctest Checkers.Core.OldBoard
 
   test "white eat right" do
-    assert Checkers.Core.Board.get_possible_right_move(
+    assert Checkers.Core.OldBoard.get_possible_right_move(
       {1, 1}, %{{1, 1} => :white, {2, 2} => :black, {3, 3} => :empty}
     ) == %Checkers.Core.Move{capture: {2, 2}, color: :white, from: {1, 1}, to: {3, 3}}
   end
   test "white cant move right cause of board" do
-    assert Checkers.Core.Board.get_possible_right_move({1, 1}, %{{1, 1} => :white,}) == nil
+    assert Checkers.Core.OldBoard.get_possible_right_move({1, 1}, %{{1, 1} => :white,}) == nil
   end
   test "white cant move right cause of enemy" do
-    assert Checkers.Core.Board.get_possible_right_move({1, 1}, %{{1, 1} => :white, {2, 2} => :black,}) == nil
+    assert Checkers.Core.OldBoard.get_possible_right_move({1, 1}, %{{1, 1} => :white, {2, 2} => :black,}) == nil
   end
   test "white cant move right cause of 2 enemies" do
-    assert Checkers.Core.Board.get_possible_right_move(
+    assert Checkers.Core.OldBoard.get_possible_right_move(
       {1, 1}, %{{1, 1} => :white, {2, 2} => :black, {3, 3} => :black}
     ) == nil
   end
   test "white cant move right cause of left capture" do
-    assert Checkers.Core.Board.get_possible_right_move(
+    assert Checkers.Core.OldBoard.get_possible_right_move(
       {3, 1},
       %{{3, 1} => :white, {2, 2} => :black, {1, 3} => :empty, {4, 2} => :empty}
     ) == nil
   end
   test "get all two moves" do
-    assert Checkers.Core.Board.all_possible_moves(
+    assert Checkers.Core.OldBoard.all_possible_moves(
       %{{3, 1} => :white, {2, 2} => :empty, {4, 2} => :empty},
       :white
     ) == [
@@ -34,7 +34,7 @@ defmodule BoardTest do
     ]
   end
   test "get all two captures" do
-    assert Checkers.Core.Board.all_possible_moves(
+    assert Checkers.Core.OldBoard.all_possible_moves(
       %{{3, 1} => :white, {2, 2} => :black, {4, 2} => :black, {1, 3} => :empty, {5, 3} => :empty},
       :white
     ) == [
@@ -43,7 +43,7 @@ defmodule BoardTest do
     ]
   end
   test "get only expected color" do
-    assert Checkers.Core.Board.all_possible_moves(
+    assert Checkers.Core.OldBoard.all_possible_moves(
       %{{3, 1} => :white, {2, 2} => :empty, {1, 3} => :black},
       :black
     ) == [

@@ -1,4 +1,4 @@
-defmodule Checkers.Core.Board do
+defmodule Checkers.Core.OldBoard do
   alias Checkers.Core.Move
   import Checkers.Core.Utils
   use Accessible
