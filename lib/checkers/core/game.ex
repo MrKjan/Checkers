@@ -41,6 +41,11 @@ defmodule Checkers.Core.Game do
   def switch_turn(:white), do: :black
   def switch_turn(:black), do: :white
 
+  @compile {:inline, promote: 1}
+  def promote(:white), do: :white_king
+  def promote(:black), do: :black_king
+  def promote(color), do: color
+
   def add_dir(sq, dir, times \\ 1)
   def add_dir({sq_x, sq_y}, _dir, times) when 0 >= times, do: {sq_x, sq_y}
   def add_dir({sq_x, sq_y}, {dir_x, dir_y} = dir, times) do
@@ -80,7 +85,7 @@ defmodule Checkers.Core.Game do
       |> try_promote(move)
       |> record_move(move)
       |> update_avaliable_turns(move)
-      # |> check_win(move)
+      |> check_win()
     end
   end
   def move(game, from, to) when is_atom(from) and is_atom(to) do
@@ -210,12 +215,16 @@ defmodule Checkers.Core.Game do
 
   def check_win(game) do
     cond do
-      # no white
-      # no black
-      # no moves for current player
+      not checkers_on_board?(game, :white) -> :black
+      not checkers_on_board?(game, :black) -> :white
+      checkers_on_board?(game, :white_king) -> :white
+      checkers_on_board?(game, :black_king) -> :black
+      [] == game.moves_valid -> switch_turn(game.turn)
       true -> game
     end
   end
+
+  def checkers_on_board?(game, color), do: [] != Enum.filter(Map.values(game.pos), fn sq -> sq == color end)
 
   def diagonal_directions(), do: [{1, 1}, {1,-1}, {-1,1}, {-1,-1}]
 
